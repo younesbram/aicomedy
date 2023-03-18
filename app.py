@@ -96,9 +96,7 @@ selected_characters = [char_info["name"] for char_info in characters.values() if
 if st.button("Generate script"):
     if topic and len(selected_characters) > 1:
         # Play the intro audio while the user waits
-        intro_audio_bytes = BytesIO()
-        intro_audio_segment = AudioSegment.from_file(BytesIO(intro_audio), format="mp3")
-        intro_audio_segment.export(intro_audio_bytes, format="mp3")
+        intro_audio_bytes = BytesIO(intro_audio)
         html_string = f"<audio controls autoplay><source src='data:audio/mp3;base64,{intro_audio_bytes.getvalue().hex()}' type='audio/mp3'></audio>"
         st.markdown(html_string, unsafe_allow_html=True)
 
@@ -127,9 +125,8 @@ if st.button("Generate script"):
                 
         st.markdown("Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
         # Play the outro audio
-        outro_audio_bytes = BytesIO()
-        outro_audio_segment = AudioSegment.from_file(BytesIO(outro_audio), format="mp3")
-        outro_audio_segment.export(outro_audio_bytes, format="mp3")
+        outro_audio_bytes = BytesIO(outro_audio)
+
         html_string = f"<audio controls autoplay><source src='data:audio/mp3;base64,{outro_audio_bytes.getvalue().hex()}' type='audio/mp3'></audio>"
         st.markdown(html_string, unsafe_allow_html=True)
 
