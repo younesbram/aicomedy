@@ -53,21 +53,29 @@ characters = {
         "name": "Jerry",
         "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/jerry.webm",
         "selected": False,
+        "laugh_path": "",
+        "key": "jerry-checkbox"
     },
     "kramer": {
         "name": "Kramer",
         "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramer.webm",
         "selected": False,
+        "laugh_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.webm",
+        "key": "kramer-checkbox"
     },
     "george": {
         "name": "George",
         "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/george.webm",
         "selected": False,
+        "laugh_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/georgelaugh.webm",
+        "key": "george-checkbox"
     },
     "larry_david": {
         "name": "Larry David",
         "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larry.webm",
         "selected": False,
+        "laugh_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm",
+        "key": "larry-checkbox"
     },
 }
 
@@ -92,15 +100,21 @@ if st.button("Generate script"):
     if topic and len(selected_characters) > 1:
         generated_script = generate_joke(topic, selected_characters)
         st.write(generated_script)
-        kramer_laugh_video_path = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.webm"
-        kramer_laugh_video_html = create_video_html(kramer_laugh_video_path)
-        st.markdown(kramer_laugh_video_html, unsafe_allow_html=True)
-        georgelaugh = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/georgelaugh.webm"
-        video_2_html = create_video_html(georgelaugh)
-        st.markdown(video_2_html, unsafe_allow_html=True)
-        larry_laugh = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm"
-        video_3_html = create_video_html(larry_laugh)
-        st.markdown(video_3_html, unsafe_allow_html=True)
+        
+        # Show dropdown with generated jokes
+        joke_options = generated_script.split("\n\n")
+        selected_joke = st.selectbox("Select a joke to generate a video clip:", joke_options)
+        
+        # Generate video clip for selected joke
+        for char_key, char_info in characters.items():
+            if char_info["name"] in selected_joke:
+                video_html = create_video_html(char_info["video_path"])
+                st.markdown(video_html, unsafe_allow_html=True)
+                if char_info["laugh_path"]:
+                    laugh_html = create_video_html(char_info["laugh_path"])
+                    st.markdown(laugh_html, unsafe_allow_html=True)
+        
+        # Add social media links
         st.markdown("Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
     else:
         st.write("Please provide a topic and select at least two characters.")
