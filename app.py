@@ -88,15 +88,10 @@ for idx, (char_key, char_info) in enumerate(characters.items()):
         char_info["selected"] = st.checkbox(char_info["name"])
 
 selected_characters = [char_info["name"] for char_info in characters.values() if char_info["selected"]]
-
-
-
 if st.button("Generate script"):
     if topic and len(selected_characters) > 1:
         # Play the intro audio while the user waits
-        intro_audio_bytes = BytesIO(intro_audio)
-        html_string = f"<audio controls autoplay><source src='data:audio/mp3;base64,{intro_audio_bytes.getvalue().hex()}' type='audio/mp3'></audio>"
-        st.markdown(html_string, unsafe_allow_html=True)
+        st.audio(intro_audio, format="audio/mp3")
 
         generated_script = generate_joke(topic, selected_characters)
         st.write(generated_script)
@@ -123,9 +118,7 @@ if st.button("Generate script"):
                 
         st.markdown("Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
         # Play the outro audio
-        outro_audio_bytes = BytesIO(outro_audio)
-        html_string = f"<audio controls autoplay><source src='data:audio/mp3;base64,{outro_audio_bytes.getvalue().hex()}' type='audio/mp3'></audio>"
-        st.markdown(html_string, unsafe_allow_html=True)
+        st.audio(outro_audio, format="audio/mp3")
 
     else:
         st.write("Please provide a topic and select at least two characters.")
