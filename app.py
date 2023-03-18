@@ -92,28 +92,27 @@ if st.button("Generate script"):
     if topic and len(selected_characters) > 1:
         generated_script = generate_joke(topic, selected_characters)
         st.write(generated_script)
-        kramer_laugh_video_path = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.webm"
-        kramer_laugh_video_html = create_video_html(kramer_laugh_video_path)
-        georgelaugh = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/georgelaugh.webm"
-        video_2_html = create_video_html(georgelaugh)
-        larry_laugh = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm"
-        video_3_html = create_video_html(larry_laugh)
-        st.markdown(
-            f"""
-            <div style='display: flex; flex-wrap: wrap;'>
-                <div style='margin-right: 16px;'>
-                    {kramer_laugh_video_html}
-                </div>
-                <div style='margin-right: 16px;'>
-                    {video_2_html}
-                </div>
-                <div>
-                    {video_3_html}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        
+        # Create a container for the laugh videos
+        laugh_videos_container = st.container()
+
+        # Create columns for each laugh video
+        num_laugh_videos = 3
+        laugh_videos_cols = laugh_videos_container.columns(num_laugh_videos)
+
+        # Create a dictionary of character name to laugh video path
+        laugh_videos = {
+            "kramer": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.webm",
+            "george": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/georgelaugh.webm",
+            "larry_david": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm",
+        }
+
+        # Display the laugh videos
+        for idx, (char_key, laugh_video_path) in enumerate(laugh_videos.items()):
+            with laugh_videos_cols[idx]:
+                laugh_video_html = create_video_html(laugh_video_path)
+                st.markdown(laugh_video_html, unsafe_allow_html=True)
+                
         st.markdown("Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
     else:
         st.write("Please provide a topic and select at least two characters.")
