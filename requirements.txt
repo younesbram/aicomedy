@@ -1,2 +1,4 @@
+ffmpeg
 openai
 streamlit
+pydub
