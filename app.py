@@ -3,6 +3,8 @@ import openai
 from PIL import Image
 import requests
 from io import BytesIO
+from pydub import AudioSegment
+from streamlit.components.v1 import html
 
 # Replace with your OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -71,6 +73,10 @@ characters = {
     },
 }
 
+intro_audio = open('intro.mp3', 'rb').read()
+outro_audio = open('outro.mp3', 'rb').read()
+
+
 # Create a container for the character selection
 character_selection_container = st.container()
 
@@ -90,6 +96,12 @@ selected_characters = [char_info["name"] for char_info in characters.values() if
 
 if st.button("Generate script"):
     if topic and len(selected_characters) > 1:
+        # Play the intro audio while the user waits
+        intro_audio_bytes = BytesIO()
+        intro_audio.export(intro_audio_bytes, format="mp3")
+        html_string = f"<audio controls autoplay><source src='data:audio/mp3;base64,{intro_audio_bytes.getvalue().hex()}' type='audio/mp3'></audio>"
+        st.markdown(html_string, unsafe_allow_html=True)
+
         generated_script = generate_joke(topic, selected_characters)
         st.write(generated_script)
         
@@ -114,5 +126,11 @@ if st.button("Generate script"):
                 st.markdown(laugh_video_html, unsafe_allow_html=True)
                 
         st.markdown("Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
+        # Play the outro audio
+        outro_audio_bytes = BytesIO()
+        outro_audio.export(outro_audio_bytes, format="mp3")
+        html_string = f"<audio controls autoplay><source src='data:audio/mp3;base64,{outro_audio_bytes.getvalue().hex()}' type='audio/mp3'></audio>"
+        st.markdown(html_string, unsafe_allow_html=True)
+
     else:
         st.write("Please provide a topic and select at least two characters.")
