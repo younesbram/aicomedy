@@ -3,8 +3,6 @@ import openai
 from PIL import Image
 import requests
 from io import BytesIO
-from pydub import AudioSegment
-from streamlit.components.v1 import html
 
 # Replace with your OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
