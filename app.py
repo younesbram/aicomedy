@@ -95,10 +95,10 @@ if st.button("Generate script"):
         kramer_laugh_video_path = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.webm"
         kramer_laugh_video_html = create_video_html(kramer_laugh_video_path)
         st.markdown(kramer_laugh_video_html, unsafe_allow_html=True)
-        georgelaugh = "https://raw.githubusercontent.com/your-username/your-repo/master/loadables/georgelaugh.webm"
+        georgelaugh = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/georgelaugh.webm"
         video_2_html = create_video_html(georgelaugh)
         st.markdown(video_2_html, unsafe_allow_html=True)
-        larry_laugh = "https://raw.githubusercontent.com/your-username/your-repo/master/loadables/larrylaugh.webm"
+        larry_laugh = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm"
         video_3_html = create_video_html(larry_laugh)
         st.markdown(video_3_html, unsafe_allow_html=True)
         st.markdown("Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
