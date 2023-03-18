@@ -126,7 +126,6 @@ if st.button("Generate script"):
         st.markdown("Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
         # Play the outro audio
         outro_audio_bytes = BytesIO(outro_audio)
-
         html_string = f"<audio controls autoplay><source src='data:audio/mp3;base64,{outro_audio_bytes.getvalue().hex()}' type='audio/mp3'></audio>"
         st.markdown(html_string, unsafe_allow_html=True)
 
