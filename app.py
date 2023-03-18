@@ -5,7 +5,7 @@ import requests
 from io import BytesIO
 
 # Replace with your OpenAI API key
-openai.api_key = st.secrets["openai_api_key"]
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 def generate_joke(topic, characters):
     # A faked few-shot conversation to prime the model into becoming a sarcastic comedian selected earlier
