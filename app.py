@@ -94,13 +94,26 @@ if st.button("Generate script"):
         st.write(generated_script)
         kramer_laugh_video_path = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.webm"
         kramer_laugh_video_html = create_video_html(kramer_laugh_video_path)
-        st.markdown(kramer_laugh_video_html, unsafe_allow_html=True)
         georgelaugh = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/georgelaugh.webm"
         video_2_html = create_video_html(georgelaugh)
-        st.markdown(video_2_html, unsafe_allow_html=True)
         larry_laugh = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm"
         video_3_html = create_video_html(larry_laugh)
-        st.markdown(video_3_html, unsafe_allow_html=True)
+        st.markdown(
+            f"""
+            <div style='display: flex; flex-wrap: wrap;'>
+                <div style='margin-right: 16px;'>
+                    {kramer_laugh_video_html}
+                </div>
+                <div style='margin-right: 16px;'>
+                    {video_2_html}
+                </div>
+                <div>
+                    {video_3_html}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         st.markdown("Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
     else:
         st.write("Please provide a topic and select at least two characters.")
