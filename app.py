@@ -5,7 +5,7 @@ import requests
 from io import BytesIO
 
 # Replace with your OpenAI API key
-openai.api_key = "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"
+openai.api_key = st.secrets["openai_api_key"]
 
 def generate_joke(topic, characters):
     # A faked few-shot conversation to prime the model into becoming a sarcastic comedian selected earlier
@@ -24,9 +24,16 @@ def generate_joke(topic, characters):
 
 def create_video_html(video_path):
     return f"""
-    <video width="200" autoplay loop muted playsinline>
-        <source src="{video_path}" type="video/webm">
-    </video>
+    <style>
+        .video-container {{
+            margin: 8px;
+        }}
+    </style>
+    <div class="video-container">
+        <video width="179.26666420" autoplay loop muted playsinline>
+            <source src="{video_path}" type="video/webm">
+        </video>
+    </div>
     """
 
 def load_image(url=None, path=None):
@@ -44,22 +51,22 @@ topic = st.text_input("Enter a topic:")
 characters = {
     "jerry": {
         "name": "Jerry",
-        "video_path": r"C:\Users\hoo-h\OneDrive\Desktop\compsci\jokegenerator\loadables\jerry.webm",
+        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/jerry.webm",
         "selected": False,
     },
     "kramer": {
         "name": "Kramer",
-        "video_path": r"C:\Users\hoo-h\OneDrive\Desktop\compsci\jokegenerator\loadables\kramer.webm",
+        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramer.webm",
         "selected": False,
     },
     "george": {
         "name": "George",
-        "video_path": r"C:\Users\hoo-h\OneDrive\Desktop\compsci\jokegenerator\loadables\george.webm",
+        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/george.webm",
         "selected": False,
     },
     "larry_david": {
         "name": "Larry David",
-        "video_path": r"C:\Users\hoo-h\OneDrive\Desktop\compsci\jokegenerator\loadables\larry.webm",
+        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larry.webm",
         "selected": False,
     },
 }
@@ -85,7 +92,15 @@ if st.button("Generate script"):
     if topic and len(selected_characters) > 1:
         generated_script = generate_joke(topic, selected_characters)
         st.write(generated_script)
-        st.video(webm_url)  # Add this line to display the WebM video
-        st
+        kramer_laugh_video_path = "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.webm"
+        kramer_laugh_video_html = create_video_html(kramer_laugh_video_path)
+        st.markdown(kramer_laugh_video_html, unsafe_allow_html=True)
+        georgelaugh = "https://raw.githubusercontent.com/your-username/your-repo/master/loadables/georgelaugh.webm"
+        video_2_html = create_video_html(georgelaugh)
+        st.markdown(video_2_html, unsafe_allow_html=True)
+        larry_laugh = "https://raw.githubusercontent.com/your-username/your-repo/master/loadables/larrylaugh.webm"
+        video_3_html = create_video_html(larry_laugh)
+        st.markdown(video_3_html, unsafe_allow_html=True)
+        st.markdown("Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
     else:
         st.write("Please provide a topic and select at least two characters.")
