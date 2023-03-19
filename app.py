@@ -102,12 +102,6 @@ characters = {
     },
 }
 
-num_seinfeld_chars = sum(
-    char_key in selected_characters for char_key in seinfeld_characters)
-num_curb_chars = sum(
-    char_key in selected_characters for char_key in curb_characters)
-
-
 # Create a container for the character selection
 character_selection_container = st.container()
 
@@ -142,6 +136,9 @@ for row in range(num_rows):
 selected_characters = [char_info["name"]
                        for char_info in characters.values() if char_info["selected"]]
 if st.button("Generate script"):
+    num_seinfeld_chars = sum(char_key in seinfeld_characters for char_key in selected_characters)
+    num_curb_chars = sum(char_key in curb_characters for char_key in selected_characters)
+
     if topic and len(selected_characters) > 1:
 
         # Determine which show's intro and outro to play based on the counts of selected characters
