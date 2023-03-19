@@ -181,6 +181,9 @@ if st.button("Generate script"):
         st.audio(intro_audio, format="audio/mp3")
         generated_script = generate_joke(topic, selected_characters)
         st.write(generated_script)
+
+        # Display the laugh videos
+        laugh_video_height = 166.666  # Set the desired height in pixels for laugh videos
         # Create a container for the laugh videos
         laugh_videos_container = st.container()
 
@@ -188,35 +191,28 @@ if st.button("Generate script"):
         num_laugh_videos = 3
         laugh_videos_cols = laugh_videos_container.columns(num_laugh_videos)
 
-# Display the laugh videos
-laugh_video_height = 166.666  # Set the desired height in pixels for laugh videos
-# Create a container for the laugh videos
-laugh_videos_container = st.container()
+        # Initialize column index
+        col_index = 0
 
-# Create columns for each laugh video
-laugh_videos_cols = laugh_videos_container.columns(num_laugh_videos)
+        for char_key, char_info in characters.items():
+            if char_info["selected"]:
+                if "laugh_video_webm" and "laugh_video_mp4" in char_info:
+                    laugh_video_webm = char_info["laugh_video_webm"]
+                    laugh_video_mp4 = char_info["laugh_video_mp4"]
 
-# Initialize column index
-col_index = 0
+                # Add laugh video to the corresponding column
+                with laugh_videos_cols[col_index]:
+                    laugh_video_html = create_video_html(
+                        laugh_video_webm, laugh_video_mp4, height=laugh_video_height, width=220)
+                    st.markdown(laugh_video_html, unsafe_allow_html=True)
 
-for char_key in selected_characters:
-    if "laugh_video_webm" and "laugh_video_mp4" in characters[char_key.lower()]:
-        laugh_video_webm = characters[char_key.lower()]["laugh_video_webm"]
-        laugh_video_mp4 = characters[char_key.lower()]["laugh_video_mp4"]
+                # Increment the column index
+                col_index += 1
 
-        # Add laugh video to the corresponding column
-        with laugh_videos_cols[col_index]:
-            laugh_video_html = create_video_html(
-                laugh_video_webm, laugh_video_mp4, height=laugh_video_height, width=220)
-            st.markdown(laugh_video_html, unsafe_allow_html=True)
-            
-        # Increment the column index
-        col_index += 1
-
-    st.markdown(
-        "Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
-    # Play the outro audio
-    st.audio(outro_audio, format="audio/mp3")
+        st.markdown(
+            "Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
+        # Play the outro audio
+        st.audio(outro_audio, format="audio/mp3")
 
 else:
     st.write("Please provide a topic and select at least two characters.")
