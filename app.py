@@ -100,15 +100,33 @@ characters = {
 intro_audio = open('intro.mp3', 'rb').read()
 outro_audio = open('outro.mp3', 'rb').read()
 
+# Create a container for the character selection
 character_selection_container = st.container()
-num_characters = len(characters)
-cols = character_selection_container.columns(num_characters)
 
-for idx, (char_key, char_info) in enumerate(characters.items()):
-    with cols[idx]:
-        video_html = create_video_html(char_info["video_path"])
-        st.markdown(video_html, unsafe_allow_html=True)
-        char_info["selected"] = st.checkbox(char_info["name"])
+# Define the number of characters per row
+characters_per_row = 4
+
+# Calculate the number of rows required
+num_rows = (len(characters) + characters_per_row - 1) // characters_per_row
+
+# Iterate through the rows and columns to display the characters
+for row in range(num_rows):
+    row_container = character_selection_container.container()
+    cols = row_container.columns(characters_per_row)
+
+    for col in range(characters_per_row):
+        idx = row * characters_per_row + col
+
+        # If there are no more characters to display, break the loop
+        if idx >= len(characters):
+            break
+
+        char_key, char_info = list(characters.items())[idx]
+        with cols[col]:
+            video_html = create_video_html(char_info["video_path"])
+            st.markdown(video_html, unsafe_allow_html=True)
+            char_info["selected"] = st.checkbox(char_info["name"])
+
 
 selected_characters = [char_info["name"]
                        for char_info in characters.values() if char_info["selected"]]
