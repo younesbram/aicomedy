@@ -19,13 +19,14 @@ st.set_page_config(
     },
 )
 
+
 def generate_joke(topic, characters):
     # A faked few-shot conversation to prime the model into becoming a sarcastic comedian selected earlier
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system",
-                "content": f"You are a extremely funny and extremely sarcastic comedian writer tasked with preserving {', '.join(characters)} jokes and delivering the same style punchlines in your short skits. You will respond in a script that includes {', '.join(characters)}"},
+                "content": f"You are an extremely funny and extremely sarcastic comedian writer tasked with preserving {', '.join(characters)} jokes and delivering the same style punchlines in your short skits. You will respond in a script that includes {', '.join(characters)}"},
             {"role": "user",
                 "content": f"the topic is: {topic}. only respond as previous instructions and reply only with character names that I gave you followed by their script(make the responses deeply affected by the character's portrayed personality on their respective shows). Do not add any extra characters."},
         ],
@@ -137,7 +138,6 @@ characters = {
         "selected": False,
     },
 }
-
 # Create a container for the character selection
 character_selection_container = st.container()
 
@@ -168,7 +168,6 @@ for row in range(num_rows):
             st.markdown(video_html, unsafe_allow_html=True)
             char_info["selected"] = st.checkbox(char_info["name"])
 
-
 selected_characters = [char_info["name"]
                        for char_info in characters.values() if char_info["selected"]]
 if st.button("Generate script"):
@@ -193,7 +192,7 @@ if st.button("Generate script"):
         # Add a spinner with a message while generating the script
         with st.spinner("Click the audio for a classic intro based on the characters you selected. Generating script..."):
             generated_script = generate_joke(topic, selected_characters)
-        
+
         st.write(generated_script)
 
         # Display the laugh videos
