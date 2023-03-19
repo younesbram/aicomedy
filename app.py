@@ -30,7 +30,7 @@ def create_video_html(video_path, height=None):
     return f"""
     <style>
         .video-container {{
-            margin: 4px;
+            margin: 8px;
         }}
     </style>
     <div class="video-container">
@@ -153,7 +153,7 @@ if st.button("Generate script"):
             "larry_david": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm",
         }
         # Display the laugh videos
-        laugh_video_height = 188  # Set the desired height in pixels for laugh videos
+        laugh_video_height = 150  # Set the desired height in pixels for laugh videos
 
     for idx, (char_key, laugh_video_path) in enumerate(laugh_videos.items()):
         with laugh_videos_cols[idx]:
