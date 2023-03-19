@@ -189,7 +189,11 @@ if st.button("Generate script"):
 
         # Play the intro audio while the user waits
         st.audio(intro_audio, format="audio/mp3")
-        generated_script = generate_joke(topic, selected_characters)
+
+        # Add a spinner with a message while generating the script
+        with st.spinner("Click the audio for a classic intro based on the characters you selected. Generating script..."):
+            generated_script = generate_joke(topic, selected_characters)
+        
         st.write(generated_script)
 
         # Display the laugh videos
