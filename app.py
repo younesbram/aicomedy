@@ -33,11 +33,16 @@ def create_video_html(video_path_webm, video_path_mp4, width=None, height=None):
     <style>
         .video-container {{
             margin: 16px;
+            display: inline-block;
+        }}
+        .video-container video {{
+            {width_attribute};
+            {height_attribute};
         }}
         @media only screen and (max-width: 480px) {{
             .video-container video {{
-                width: 25%; /* Change this value to the desired width for smaller screens */
-                height: 25%;
+                width: 50%; /* Change this value to the desired width for smaller screens */
+                height: auto;
             }}
         }}
     </style>
@@ -48,7 +53,6 @@ def create_video_html(video_path_webm, video_path_mp4, width=None, height=None):
         </video>
     </div>
     """
-
 
 
 def load_image(url=None, path=None):
@@ -93,8 +97,8 @@ characters = {
         "name": "Larry David",
         "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larry.webm",
         "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larry.mp4",
-        "laugh_video_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrydavidlaugh.mp4",
-        "laugh_video_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrydavidlaugh.webm",
+        "laugh_video_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.mp4",
+        "laugh_video_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm",
         "selected": False,
     },
     "elaine": {
@@ -150,7 +154,7 @@ for row in range(num_rows):
         video_height = 120  # Set the desired height in pixels
         with cols[col]:
             video_html = create_video_html(
-    char_info["videopath_webm"], char_info["videopath_mp4"], height=video_height)
+                char_info["videopath_webm"], char_info["videopath_mp4"], height=video_height)
             st.markdown(video_html, unsafe_allow_html=True)
             char_info["selected"] = st.checkbox(char_info["name"])
 
@@ -158,8 +162,10 @@ for row in range(num_rows):
 selected_characters = [char_info["name"]
                        for char_info in characters.values() if char_info["selected"]]
 if st.button("Generate script"):
-    num_seinfeld_chars = sum(char_key in seinfeld_characters for char_key in selected_characters)
-    num_curb_chars = sum(char_key in curb_characters for char_key in selected_characters)
+    num_seinfeld_chars = sum(char_key in seinfeld_characters for char_key,
+                             char_info in characters.items() if char_info["selected"])
+    num_curb_chars = sum(char_key in curb_characters for char_key,
+                         char_info in characters.items() if char_info["selected"])
 
     if topic and len(selected_characters) > 1:
 
@@ -182,18 +188,30 @@ if st.button("Generate script"):
         num_laugh_videos = 3
         laugh_videos_cols = laugh_videos_container.columns(num_laugh_videos)
 
-        # Display the laugh videos
-        laugh_video_height = 166.666  # Set the desired height in pixels for laugh videos
-        laugh_videos_container = st.container()
+# Display the laugh videos
+laugh_video_height = 166.666  # Set the desired height in pixels for laugh videos
+# Create a container for the laugh videos
+laugh_videos_container = st.container()
 
-        for char_key in selected_characters:
-            if "laugh_video_webm" and "laugh_video_mp4" in characters[char_key]:
-                laugh_video_webm = characters[char_key]["laugh_video_webm"]
-                laugh_video_mp4 = characters[char_key]["laugh_video_mp4"]
-                with laugh_videos_container:
-                    laugh_video_html = create_video_html(laugh_video_webm, laugh_video_mp4, height=laugh_video_height, width=220)
-                    st.markdown(laugh_video_html, unsafe_allow_html=True)
+# Create columns for each laugh video
+laugh_videos_cols = laugh_videos_container.columns(num_laugh_videos)
 
+# Initialize column index
+col_index = 0
+
+for char_key in selected_characters:
+    if "laugh_video_webm" and "laugh_video_mp4" in characters[char_key.lower()]:
+        laugh_video_webm = characters[char_key.lower()]["laugh_video_webm"]
+        laugh_video_mp4 = characters[char_key.lower()]["laugh_video_mp4"]
+
+        # Add laugh video to the corresponding column
+        with laugh_videos_cols[col_index]:
+            laugh_video_html = create_video_html(
+                laugh_video_webm, laugh_video_mp4, height=laugh_video_height, width=220)
+            st.markdown(laugh_video_html, unsafe_allow_html=True)
+            
+        # Increment the column index
+        col_index += 1
 
     st.markdown(
         "Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
