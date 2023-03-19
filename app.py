@@ -15,7 +15,8 @@ def generate_joke(topic, characters):
         messages=[
             {"role": "system",
                 "content": f"You are a extremely funny and extremely sarcastic comedian writer tasked with preserving {', '.join(characters)} jokes and delivering the same style punchlines in your short skits. You will respond in a script that includes {', '.join(characters)}"},
-            {"role": "user", "content": f"the topic is: {topic}. only respond as previous instructions and reply only with character names that I gave you followed by their script(make the responses deeply affected by the character's portrayed personality on their respective shows). Do not add any extra characters."},
+            {"role": "user",
+                "content": f"the topic is: {topic}. only respond as previous instructions and reply only with character names that I gave you followed by their script(make the responses deeply affected by the character's portrayed personality on their respective shows). Do not add any extra characters."},
         ],
         temperature=0.66666666666666666666666420,
     )
@@ -42,7 +43,6 @@ def create_video_html(video_path, width=None, height=None):
     """
 
 
-
 def load_image(url=None, path=None):
     if url:
         response = requests.get(url)
@@ -56,6 +56,8 @@ st.title("Seinfeld gpt-3.5 Joke Generator")
 
 topic = st.text_input("Enter a topic:")
 
+seinfeld_characters = ["jerry", "kramer", "george", "elaine", "newman"]
+curb_characters = ["larry_david", "leon", "jeff"]
 characters = {
     "jerry": {
         "name": "Jerry",
@@ -100,8 +102,11 @@ characters = {
     },
 }
 
-intro_audio = open('intro.mp3', 'rb').read()
-outro_audio = open('outro.mp3', 'rb').read()
+num_seinfeld_chars = sum(
+    char_key in selected_characters for char_key in seinfeld_characters)
+num_curb_chars = sum(
+    char_key in selected_characters for char_key in curb_characters)
+
 
 # Create a container for the character selection
 character_selection_container = st.container()
@@ -125,10 +130,11 @@ for row in range(num_rows):
             break
 
         char_key, char_info = list(characters.items())[idx]
-        
+
         video_height = 120  # Set the desired height in pixels
         with cols[col]:
-            video_html = create_video_html(char_info["video_path"], height=video_height)
+            video_html = create_video_html(
+                char_info["video_path"], height=video_height)
             st.markdown(video_html, unsafe_allow_html=True)
             char_info["selected"] = st.checkbox(char_info["name"])
 
@@ -137,6 +143,15 @@ selected_characters = [char_info["name"]
                        for char_info in characters.values() if char_info["selected"]]
 if st.button("Generate script"):
     if topic and len(selected_characters) > 1:
+
+        # Determine which show's intro and outro to play based on the counts of selected characters
+        if num_seinfeld_chars > num_curb_chars:
+            intro_audio = open('sounds/introseinfeld.mp3', 'rb').read()
+            outro_audio = open('sounds/outroseinfeld.mp3', 'rb').read()
+        else:
+            intro_audio = open('sounds/introcurb.mp3', 'rb').read()
+            outro_audio = open('sounds/outrocurb.mp3', 'rb').read()
+
         # Play the intro audio while the user waits
         st.audio(intro_audio, format="audio/mp3")
         generated_script = generate_joke(topic, selected_characters)
@@ -159,7 +174,8 @@ if st.button("Generate script"):
 
     for idx, (char_key, laugh_video_path) in enumerate(laugh_videos.items()):
         with laugh_videos_cols[idx]:
-            laugh_video_html = create_video_html(laugh_video_path, height=laugh_video_height, width=220)
+            laugh_video_html = create_video_html(
+                laugh_video_path, height=laugh_video_height, width=220)
             st.markdown(laugh_video_html, unsafe_allow_html=True)
 
     st.markdown(
