@@ -25,20 +25,22 @@ def generate_joke(topic, characters):
     return generated_text
 
 
-def create_video_html(video_path, height=None):
+def create_video_html(video_path, width=None, height=None):
+    width_attribute = f'width="{width}"' if width else ""
     height_attribute = f'height="{height}"' if height else ""
     return f"""
     <style>
         .video-container {{
-            margin: 8px;
+            margin: 16px;
         }}
     </style>
     <div class="video-container">
-        <video {height_attribute} autoplay loop muted playsinline>
+        <video {width_attribute} {height_attribute} autoplay loop muted playsinline>
             <source src="{video_path}" type="video/webm">
         </video>
     </div>
     """
+
 
 
 def load_image(url=None, path=None):
@@ -153,11 +155,11 @@ if st.button("Generate script"):
             "larry_david": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm",
         }
         # Display the laugh videos
-        laugh_video_height = 150  # Set the desired height in pixels for laugh videos
+        laugh_video_height = 166.666  # Set the desired height in pixels for laugh videos
 
     for idx, (char_key, laugh_video_path) in enumerate(laugh_videos.items()):
         with laugh_videos_cols[idx]:
-            laugh_video_html = create_video_html(laugh_video_path, height=laugh_video_height)
+            laugh_video_html = create_video_html(laugh_video_path, height=laugh_video_height, width=220)
             st.markdown(laugh_video_html, unsafe_allow_html=True)
 
     st.markdown(
