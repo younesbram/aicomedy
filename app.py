@@ -202,8 +202,7 @@ if st.button("Generate script"):
 
                 # Add laugh video to the corresponding column
                 with laugh_videos_cols[col_index]:
-                    laugh_video_html = create_video_html(
-                        laugh_video_webm, laugh_video_mp4, height=laugh_video_height, width=220)
+                    laugh_video_html = create_video_html(laugh_video_webm, laugh_video_mp4,width=220, height=laugh_video_height)
                     st.markdown(laugh_video_html, unsafe_allow_html=True)
 
                 # Increment the column index
