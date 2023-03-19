@@ -26,7 +26,7 @@ def generate_joke(topic, characters):
     return generated_text
 
 
-def create_video_html(videopath_webm, videopath_mp4, width=None, height=None):
+def create_video_html(video_path_webm, video_path_mp4, width=None, height=None):
     width_attribute = f'width="{width}"' if width else ""
     height_attribute = f'height="{height}"' if height else ""
     return f"""
@@ -34,11 +34,17 @@ def create_video_html(videopath_webm, videopath_mp4, width=None, height=None):
         .video-container {{
             margin: 16px;
         }}
+        @media only screen and (max-width: 480px) {{
+            .video-container video {{
+                width: 25%; /* Change this value to the desired width for smaller screens */
+                height: 25%;
+            }}
+        }}
     </style>
     <div class="video-container">
         <video {width_attribute} {height_attribute} autoplay loop muted playsinline>
-            <source src="{videopath_webm}" type="video/webm">
-            <source src="{videopath_mp4}" type="video/mp4">
+            <source src="{video_path_webm}" type="video/webm">
+            <source src="{video_path_mp4}" type="video/mp4">
         </video>
     </div>
     """
@@ -71,18 +77,24 @@ characters = {
         "name": "Kramer",
         "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramer.webm",
         "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramer.mp4",
+        "laugh_video_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.webm",
+        "laugh_video_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.mp4",
         "selected": False,
     },
     "george": {
         "name": "George",
         "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/george.webm",
         "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/george.mp4",
+        "laugh_video_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/georgelaugh.mp4",
+        "laugh_video_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/georgelaugh.webm",
         "selected": False,
     },
     "larry_david": {
         "name": "Larry David",
         "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larry.webm",
         "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larry.mp4",
+        "laugh_video_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrydavidlaugh.mp4",
+        "laugh_video_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrydavidlaugh.webm",
         "selected": False,
     },
     "elaine": {
@@ -170,20 +182,18 @@ if st.button("Generate script"):
         num_laugh_videos = 3
         laugh_videos_cols = laugh_videos_container.columns(num_laugh_videos)
 
-        # Create a dictionary of character name to laugh video path
-        laugh_videos = {
-            "kramer": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.webm",
-            "george": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/georgelaugh.webm",
-            "larry_david": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm",
-        }
         # Display the laugh videos
         laugh_video_height = 166.666  # Set the desired height in pixels for laugh videos
+        laugh_videos_container = st.container()
 
-    for idx, (char_key, laugh_video_path) in enumerate(laugh_videos.items()):
-        with laugh_videos_cols[idx]:
-            laugh_video_html = create_video_html(
-                laugh_video_path, height=laugh_video_height, width=220)
-            st.markdown(laugh_video_html, unsafe_allow_html=True)
+        for char_key in selected_characters:
+            if "laugh_video_webm" and "laugh_video_mp4" in characters[char_key]:
+                laugh_video_webm = characters[char_key]["laugh_video_webm"]
+                laugh_video_mp4 = characters[char_key]["laugh_video_mp4"]
+                with laugh_videos_container:
+                    laugh_video_html = create_video_html(laugh_video_webm, laugh_video_mp4, height=laugh_video_height, width=220)
+                    st.markdown(laugh_video_html, unsafe_allow_html=True)
+
 
     st.markdown(
         "Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
