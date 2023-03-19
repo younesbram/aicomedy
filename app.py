@@ -15,9 +15,9 @@ def generate_joke(topic, characters):
         messages=[
             {"role": "system",
                 "content": f"You are a extremely funny and extremely sarcastic comedian writer tasked with preserving {', '.join(characters)} jokes and delivering the same style punchlines in your short skits. You will respond in a script that includes {', '.join(characters)}"},
-            {"role": "user", "content": f"the topic is: {topic}. only respond as previous instructions and reply only with character names that I gave you followed by their script. Do not add any extra characters."},
+            {"role": "user", "content": f"the topic is: {topic}. only respond as previous instructions and reply only with character names that I gave you followed by their script(make the responses deeply affected by the character's portrayed personality on their respective shows). Do not add any extra characters."},
         ],
-        temperature=0.66666666666666666666666,
+        temperature=0.66666666666666666666666420,
     )
 
     # Get the generated text from the response
@@ -126,7 +126,7 @@ for row in range(num_rows):
 
         char_key, char_info = list(characters.items())[idx]
         
-        video_height = 150  # Set the desired height in pixels
+        video_height = 120  # Set the desired height in pixels
         with cols[col]:
             video_html = create_video_html(char_info["video_path"], height=video_height)
             st.markdown(video_html, unsafe_allow_html=True)
