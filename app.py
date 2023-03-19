@@ -183,30 +183,31 @@ if st.button("Generate script"):
         st.write(generated_script)
 
         # Display the laugh videos
-        laugh_video_height = 166.666  # Set the desired height in pixels for laugh videos
+        # Set the desired height in pixels for laugh videos
+        laugh_video_height = 166.666666666666666666666666666666666666666666666666420666666666666666666666666666666666
         # Create a container for the laugh videos
         laugh_videos_container = st.container()
 
         # Create columns for each laugh video
-        num_laugh_videos = 3
+        num_laugh_videos = 3  # TODO : Make the unchecked characters the ones laughing
         laugh_videos_cols = laugh_videos_container.columns(num_laugh_videos)
 
         # Initialize column index
         col_index = 0
 
         for char_key, char_info in characters.items():
-            if char_info["selected"]:
-                if "laugh_video_webm" and "laugh_video_mp4" in char_info:
-                    laugh_video_webm = char_info["laugh_video_webm"]
-                    laugh_video_mp4 = char_info["laugh_video_mp4"]
+            if char_info["selected"] and "laugh_video_webm" in char_info and "laugh_video_mp4" in char_info:
+                laugh_video_webm = char_info["laugh_video_webm"]
+                laugh_video_mp4 = char_info["laugh_video_mp4"]
 
-                # Add laugh video to the corresponding column
-                with laugh_videos_cols[col_index]:
-                    laugh_video_html = create_video_html(laugh_video_webm, laugh_video_mp4,width=220, height=laugh_video_height)
-                    st.markdown(laugh_video_html, unsafe_allow_html=True)
+        # Add laugh video to the corresponding column
+        with laugh_videos_cols[col_index]:
+            laugh_video_html = create_video_html(
+                laugh_video_webm, laugh_video_mp4, width=220, height=laugh_video_height)
+            st.markdown(laugh_video_html, unsafe_allow_html=True)
 
-                # Increment the column index
-                col_index += 1
+        # Increment the column index
+        col_index += 1
 
         st.markdown(
             "Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
