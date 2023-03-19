@@ -33,34 +33,24 @@ def create_video_html(video_path_webm, video_path_mp4, width=None, height=None):
     <style>
         .video-container {{
             margin: 16px;
-            display: flex;
-            flex-wrap: wrap;
+            display: inline-block;
         }}
-        .video-wrapper {{
-            flex: 0 0 20%; /* Adjust this value to change the width of the videos */
-            max-width: 20%; /* Make sure this value matches the flex-basis */
-        }}
-        .video-wrapper video {{
+        .video-container video {{
             {width_attribute};
             {height_attribute};
-            width: 100%;
-            height: auto;
         }}
-        /* Media query for iPhones and iPads */
-        @media only screen and (max-width: 480px), only screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) {{
-            .video-wrapper {{
-                flex: 0 0 20%; /* Adjust this value to change the width of the videos on Apple devices */
-                max-width: 20%; /* Make sure this value matches the flex-basis */
+        @media only screen and (max-width: 480px) {{
+            .video-container video {{
+                width: 50%; /* Change this value to the desired width for smaller screens */
+                height: auto;
             }}
         }}
     </style>
     <div class="video-container">
-        <div class="video-wrapper">
-            <video {width_attribute} {height_attribute} autoplay loop muted playsinline>
-                <source src="{video_path_webm}" type="video/webm">
-                <source src="{video_path_mp4}" type="video/mp4">
-            </video>
-        </div>
+        <video {width_attribute} {height_attribute} autoplay loop muted playsinline>
+            <source src="{video_path_webm}" type="video/webm">
+            <source src="{video_path_mp4}" type="video/mp4">
+        </video>
     </div>
     """
 
