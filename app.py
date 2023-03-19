@@ -7,6 +7,17 @@ from io import BytesIO
 # Replace with your OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
+st.set_page_config(
+    page_title="AI Comedy",
+    page_icon="🎭",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        "Get Help": "https://www.github.com/younesbram/aicomedy",
+        "Report a bug": "https://www.younes.ca/contact",
+        "About": "# AI Comedy\nAn app that uses NLP to generate hilarious skits!",
+    },
+)
 
 def generate_joke(topic, characters):
     # A faked few-shot conversation to prime the model into becoming a sarcastic comedian selected earlier
