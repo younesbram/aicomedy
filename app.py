@@ -26,7 +26,7 @@ def generate_joke(topic, characters):
     return generated_text
 
 
-def create_video_html(video_path_webm, video_path_mp4, width=None, height=None):
+def create_video_html(videopath_webm, videopath_mp4, width=None, height=None):
     width_attribute = f'width="{width}"' if width else ""
     height_attribute = f'height="{height}"' if height else ""
     return f"""
@@ -37,8 +37,8 @@ def create_video_html(video_path_webm, video_path_mp4, width=None, height=None):
     </style>
     <div class="video-container">
         <video {width_attribute} {height_attribute} autoplay loop muted playsinline>
-            <source src="{video_path_webm}" type="video/webm">
-            <source src="{video_path_mp4}" type="video/mp4">
+            <source src="{videopath_webm}" type="video/webm">
+            <source src="{videopath_mp4}" type="video/mp4">
         </video>
     </div>
     """
@@ -138,7 +138,7 @@ for row in range(num_rows):
         video_height = 120  # Set the desired height in pixels
         with cols[col]:
             video_html = create_video_html(
-    char_info["video_path_webm"], char_info["video_path_mp4"], height=video_height)
+    char_info["videopath_webm"], char_info["videopath_mp4"], height=video_height)
             st.markdown(video_html, unsafe_allow_html=True)
             char_info["selected"] = st.checkbox(char_info["name"])
 
