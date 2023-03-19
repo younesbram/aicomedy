@@ -26,7 +26,7 @@ def generate_joke(topic, characters):
     return generated_text
 
 
-def create_video_html(video_path, width=None, height=None):
+def create_video_html(video_path_webm, video_path_mp4, width=None, height=None):
     width_attribute = f'width="{width}"' if width else ""
     height_attribute = f'height="{height}"' if height else ""
     return f"""
@@ -37,10 +37,12 @@ def create_video_html(video_path, width=None, height=None):
     </style>
     <div class="video-container">
         <video {width_attribute} {height_attribute} autoplay loop muted playsinline>
-            <source src="{video_path}" type="video/webm">
+            <source src="{video_path_webm}" type="video/webm">
+            <source src="{video_path_mp4}" type="video/mp4">
         </video>
     </div>
     """
+
 
 
 def load_image(url=None, path=None):
@@ -61,43 +63,51 @@ curb_characters = ["larry_david", "leon", "jeff"]
 characters = {
     "jerry": {
         "name": "Jerry",
-        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/jerry.webm",
+        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/jerry.webm",
+        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/jerry.mp4",
         "selected": False,
     },
     "kramer": {
         "name": "Kramer",
-        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramer.webm",
+        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramer.webm",
+        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramer.mp4",
         "selected": False,
     },
     "george": {
         "name": "George",
-        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/george.webm",
+        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/george.webm",
+        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/george.mp4",
         "selected": False,
     },
     "larry_david": {
         "name": "Larry David",
-        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larry.webm",
+        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larry.webm",
+        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larry.mp4",
         "selected": False,
     },
     "elaine": {
         "name": "Elaine",
-        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/elaine.webm",
+        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/elaine.webm",
+        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/elaine.mp4",
         "selected": False,
     },
     "newman": {
         "name": "Newman",
-        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/newman.webm",
+        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/newman.webm",
+        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/newman.mp4",
         "selected": False,
     },
     "leon": {
         "name": "Leon",
         # Replace with the actual URL for
-        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/leon.webm",
+        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/leon.webm",
+        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/leon.mp4",
         "selected": False,
     },
     "jeff": {
         "name": "Jeff",
-        "video_path": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/jeff.webm",
+        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/jeff.webm",
+        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/jeff.mp4",
         "selected": False,
     },
 }
@@ -128,7 +138,7 @@ for row in range(num_rows):
         video_height = 120  # Set the desired height in pixels
         with cols[col]:
             video_html = create_video_html(
-                char_info["video_path"], height=video_height)
+    char_info["video_path_webm"], char_info["video_path_mp4"], height=video_height)
             st.markdown(video_html, unsafe_allow_html=True)
             char_info["selected"] = st.checkbox(char_info["name"])
 
