@@ -25,15 +25,16 @@ def generate_joke(topic, characters):
     return generated_text
 
 
-def create_video_html(video_path):
+def create_video_html(video_path, height=None):
+    height_attribute = f'height="{height}"' if height else ""
     return f"""
     <style>
         .video-container {{
-            margin: 8px;
+            margin: 4px;
         }}
     </style>
     <div class="video-container">
-        <video width="179.26666420" autoplay loop muted playsinline>
+        <video {height_attribute} autoplay loop muted playsinline>
             <source src="{video_path}" type="video/webm">
         </video>
     </div>
@@ -122,8 +123,10 @@ for row in range(num_rows):
             break
 
         char_key, char_info = list(characters.items())[idx]
+        
+        video_height = 150  # Set the desired height in pixels
         with cols[col]:
-            video_html = create_video_html(char_info["video_path"])
+            video_html = create_video_html(char_info["video_path"], height=video_height)
             st.markdown(video_html, unsafe_allow_html=True)
             char_info["selected"] = st.checkbox(char_info["name"])
 
@@ -150,9 +153,11 @@ if st.button("Generate script"):
             "larry_david": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm",
         }
         # Display the laugh videos
+        laugh_video_height = 100  # Set the desired height in pixels for laugh videos
+
     for idx, (char_key, laugh_video_path) in enumerate(laugh_videos.items()):
         with laugh_videos_cols[idx]:
-            laugh_video_html = create_video_html(laugh_video_path)
+            laugh_video_html = create_video_html(laugh_video_path, height=laugh_video_height)
             st.markdown(laugh_video_html, unsafe_allow_html=True)
 
     st.markdown(
