@@ -195,8 +195,10 @@ if st.button("Generate script"):
         # Initialize column index
         col_index = 0
 
-        for char_key, char_info in characters.items():
-            if char_info["selected"] and "laugh_video_webm" in char_info and "laugh_video_mp4" in char_info:
+        laugh_video_characters = ["kramer", "george", "larry_david"]
+        for char_key in laugh_video_characters:
+            char_info = characters[char_key]
+            if "laugh_video_webm" in char_info and "laugh_video_mp4" in char_info:
                 laugh_video_webm = char_info["laugh_video_webm"]
                 laugh_video_mp4 = char_info["laugh_video_mp4"]
 
