@@ -126,7 +126,6 @@ characters = {
     },
     "leon": {
         "name": "Leon",
-        # Replace with the actual URL for
         "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/leon.webm",
         "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/leon.mp4",
         "selected": False,
@@ -213,14 +212,14 @@ if st.button("Generate script"):
                 laugh_video_webm = char_info["laugh_video_webm"]
                 laugh_video_mp4 = char_info["laugh_video_mp4"]
 
-        # Add laugh video to the corresponding column
-        with laugh_videos_cols[col_index]:
-            laugh_video_html = create_video_html(
-                laugh_video_webm, laugh_video_mp4, width=220, height=laugh_video_height)
-            st.markdown(laugh_video_html, unsafe_allow_html=True)
+            # Add laugh video to the corresponding column
+            with laugh_videos_cols[col_index]:
+                laugh_video_html = create_video_html(
+                    laugh_video_webm, laugh_video_mp4, width=220, height=laugh_video_height)
+                st.markdown(laugh_video_html, unsafe_allow_html=True)
 
-        # Increment the column index
-        col_index += 1
+            # Increment the column index
+            col_index += 1
 
         st.markdown(
             "Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
