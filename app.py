@@ -53,7 +53,7 @@ def generate_joke_with_groq(topic, characters):
         {"role": "system",
             "content": f"You never give emotions in the script or pauses or descriptors or laughs. NO (pauses) NO (smirks) NO (laughs) NO ANY OF THAT ONLY THE TEXT!!!! You are an extremely funny and sarcastic comedian writer that knows Larry David and Jerry Seinfeld's writing styles, tasked with preserving {', '.join(characters)} jokes and delivering the same style punchlines in your short skits. You will respond in a script that includes {', '.join(characters)}."},
         {"role": "user",
-            "content": f"The topic is: {topic}. Only respond as previous instructions and be extremely funny, like genius comedy. Do not add any extra characters. Do not add any descriptors like (pauses) or (excitedly) NO MATTER WHAT!  because I will be programmatically generating voice clips from the script. So anything like (sarcastically) or ANYTHING like that will destroy our whole moat and program. Take this seriously. INCLUDE EVERY CHARACTER SELECTED . {', '.join(characters)}"},
+            "content": f"The topic is: {topic}. Please obey newlines and DONT give ANY descriptors only Character: speech for the ENTIRE script only with the characters selected. Nothing else or else the system bugs. Only respond as previous instructions and be extremely funny, like genius comedy. Do not add any extra characters. Do not add any descriptors like (pauses) or (excitedly) NO MATTER WHAT!  because I will be programmatically generating voice clips from the script. So anything like (sarcastically) or ANYTHING like that will destroy our whole moat and program. Take this seriously. INCLUDE EVERY CHARACTER SELECTED . {', '.join(characters)}"},
     ]
 
     stream = client.chat.completions.create(
@@ -175,8 +175,8 @@ def generate_voice(character_name, text):
         "text": text,
         "model_id": "eleven_multilingual_v2",
         "voice_settings": {
-            "stability": 0.5,
-            "similarity_boost": 0.6
+            "stability": 0.4,
+            "similarity_boost": 0.7
         }
     }
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
@@ -224,7 +224,7 @@ st.title("AI Skit Generator")
 
 # Topic input and optional image upload
 topic = st.text_input("Enter a topic:")
-uploaded_image = st.file_uploader("Upload an image (optional)", type=["jpg", "jpeg", "png"])
+uploaded_image = st.file_uploader("Upload an image (optional - you can do only image or image + topic)", type=["jpg", "jpeg", "png"])
 
 # Character selection
 seinfeld_characters = ["jerry", "kramer", "george", "elaine", "newman"]
@@ -342,7 +342,7 @@ if st.button("Generate script"):
         st.audio(intro_audio, format="audio/mp3")
 
         # Add a spinner with a message while generating the script
-        with st.spinner("Generating script... This might take a few moments..."):
+        with st.spinner("Generating script... This might take a few moments... might as well follow my twitter and github.."):
             image_data = None
             use_gpt4 = False
             if uploaded_image:
@@ -390,4 +390,4 @@ st.markdown(
 if st.session_state.get('outro_audio'):
     st.audio(st.session_state['outro_audio'], format="audio/mp3")
 else:
-    st.write("Please provide a topic or upload an image and select at least two characters.")
+    st.write("Please provide a topic or upload an image and select at least two characters. Not all voices are supported. Currently supported voices are: Jerry, Kramer, George, Elaine.")
