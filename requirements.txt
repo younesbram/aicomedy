@@ -1,4 +1,6 @@
-openai
 streamlit
-audioread
-bokeh
+openai
+Pillow
+requests
+groq
+python-dotenv
