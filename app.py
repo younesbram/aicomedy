@@ -53,7 +53,7 @@ def generate_joke_with_groq(topic, characters):
         {"role": "system",
             "content": f"You never give emotions in the script or pauses or descriptors or laughs. NO (pauses) NO (smirks) NO (laughs) NO ANY OF THAT ONLY THE TEXT!!!! You are an extremely funny and sarcastic comedian writer that knows Larry David and Jerry Seinfeld's writing styles, tasked with preserving {', '.join(characters)} jokes and delivering the same style punchlines in your short skits. You will respond in a script that includes {', '.join(characters)}."},
         {"role": "user",
-            "content": f"The topic is: {topic}. Please obey newlines and DONT give ANY descriptors only Character: speech for the ENTIRE script only with the characters selected. Nothing else or else the system bugs. Only respond as previous instructions and be extremely funny, like genius comedy. Do not add any extra characters. Do not add any descriptors like (pauses) or (excitedly) NO MATTER WHAT!  because I will be programmatically generating voice clips from the script. So anything like (sarcastically) or ANYTHING like that will destroy our whole moat and program. Take this seriously. INCLUDE EVERY CHARACTER SELECTED . {', '.join(characters)}"},
+            "content": f"The topic is: {topic}. Please obey newlines and DONT give ANY descriptors only Character: speech for the ENTIRE script only with the characters. Nothing else or else the system bugs. Only respond as previous instructions and be extremely funny, like genius comedy. Do not add any extra characters. Do not add any descriptors like (pauses) or (excitedly) NO MATTER WHAT!  because I will be programmatically generating voice clips from the script. So anything like (sarcastically) or ANYTHING like that will destroy our whole moat and program. Take this seriously. INCLUDE EVERY CHARACTER SELECTED . {', '.join(characters)}"},
     ]
 
     stream = client.chat.completions.create(
@@ -175,8 +175,8 @@ def generate_voice(character_name, text):
         "text": text,
         "model_id": "eleven_multilingual_v2",
         "voice_settings": {
-            "stability": 0.4,
-            "similarity_boost": 0.7
+            "stability": 0.5,
+            "similarity_boost": 0.6
         }
     }
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
