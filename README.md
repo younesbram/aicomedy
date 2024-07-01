@@ -13,6 +13,9 @@ Dynamic character selection
 GPT-3.5 powered script generation
 Expandable comedian roster
 # Technologies
+<a href="https://elevenlabs.io/text-to-speech">
+<img src="https://storage.googleapis.com/eleven-public-cdn/images/elevenlabs-grants-logo.png" alt="Text to Speech" style="width:250px">
+</a>
 * Python
 * Streamlit
 * OpenAI GPT-3.5
@@ -47,3 +50,4 @@ This project uses AI-generated text from OpenAI's GPT-3.5. Please ensure that th
 
 # License
 This project is licensed under the MIT License.
+
