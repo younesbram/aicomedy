@@ -1,6 +1,7 @@
 streamlit
 openai
 Pillow
+ffmpeg
 requests
 groq
 python-dotenv
