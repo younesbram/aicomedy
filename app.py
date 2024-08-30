@@ -6,6 +6,8 @@ from PIL import Image
 import requests
 from io import BytesIO
 import base64
+import ffmpeg
+import tempfile
 from groq import Groq
 
 # Load environment variables from .env file
@@ -18,11 +20,7 @@ groq_api_key = st.secrets["GROQ_API_KEY"]
 jerry_voice = st.secrets["JERRY_VOICE"]
 kramer_voice = st.secrets["KRAMER_VOICE"]
 george_voice = st.secrets["GEORGE_VOICE"]
-larry_david_voice = st.secrets["LARRY_DAVID_VOICE"]
 elaine_voice = st.secrets["ELAINE_VOICE"]
-newman_voice = st.secrets["NEWMAN_VOICE"]
-leon_voice = st.secrets["LEON_VOICE"]
-jeff_voice = st.secrets["JEFF_VOICE"]
 
 if not groq_api_key:
     raise ValueError("GROQ_API_KEY environment variable not set")
@@ -157,10 +155,6 @@ def generate_voice(character_name, text):
         "kramer": kramer_voice,
         "george": george_voice,
         "elaine": elaine_voice,
-        "newman": newman_voice,
-        "larry_david": larry_david_voice,
-        "leon": leon_voice,
-        "jeff": jeff_voice
     }.get(character_name.lower())
     
     if not voice_id:
@@ -192,9 +186,7 @@ def stitch_audio_segments(audio_segments):
     combined_audio = b""
     for segment in audio_segments:
         combined_audio += segment
-    with open("combined_audio.mp3", "wb") as f:
-        f.write(combined_audio)
-    return "combined_audio.mp3"
+    return combined_audio
 
 def generate_audio_script(script):
     lines = script.split("\n")
@@ -216,9 +208,71 @@ def generate_audio_script(script):
         progress_bar.progress((i + 1) / len(lines))
 
     if audio_segments:
-        audio_file_path = stitch_audio_segments(audio_segments)
+        combined_audio = stitch_audio_segments(audio_segments)
+        audio_file_path = "generated_audio.mp3"
+        with open(audio_file_path, "wb") as f:
+            f.write(combined_audio)
         return audio_file_path
     return None
+
+def generate_video_with_audio(audio_path, images_paths, output_path, user_image_path=None):
+    # Create a temp directory to store the intermediate files
+    with tempfile.TemporaryDirectory() as tempdir:
+        # Load the images and audio
+        image_inputs = [ffmpeg.input(image) for image in images_paths]
+        audio_input = ffmpeg.input(audio_path)
+        
+        if user_image_path:
+            user_image_input = ffmpeg.input(user_image_path)
+        
+        # Create filter complex for video
+        filters = []
+        for i, image in enumerate(image_inputs):
+            filters.append(f"[{i}:v]scale=320:240,setpts=PTS-STARTPTS[v{i}]")
+        
+        if user_image_path:
+            filters.append("[4:v]scale=320:240,setpts=PTS-STARTPTS[user]")
+
+        filter_complex = ";".join(filters)
+        
+        output_args = {
+            'c:v': 'libx264',
+            'c:a': 'aac',
+            'pix_fmt': 'yuv420p',
+            'shortest': None
+        }
+        
+        # Build the command
+        stream = ffmpeg.filter_multi_output(image_inputs, 'concat', n=len(images_paths), v=1, a=0).output(
+            audio_input.audio, **output_args
+        )
+
+        if user_image_path:
+            stream = ffmpeg.overlay(stream, user_image_input).output(output_path)
+
+        # Run the ffmpeg command
+        ffmpeg.run(stream)
+
+def create_video_with_images_and_audio(script, audio_path, user_image=None):
+    # Define the paths to the images
+    image_paths = {
+        "jerry": "path/to/jerry.png",
+        "kramer": "path/to/kramer.png",
+        "george": "path/to/george.png",
+        "elaine": "path/to/elaine.png",
+    }
+    lines = script.split("\n")
+    used_images = []
+    for line in lines:
+        if ":" in line:
+            character = line.split(":")[0].strip().lower()
+            used_images.append(image_paths.get(character))
+
+    output_video_path = "generated_video.mp4"
+    
+    generate_video_with_audio(audio_path, used_images, output_video_path, user_image)
+    
+    return output_video_path
 
 st.title("AI Skit Generator")
 
@@ -227,8 +281,7 @@ topic = st.text_input("Enter a topic:")
 uploaded_image = st.file_uploader("Upload an image (optional - you can do only image or image + topic)", type=["jpg", "jpeg", "png"])
 
 # Character selection
-seinfeld_characters = ["jerry", "kramer", "george", "elaine", "newman"]
-curb_characters = ["larry_david", "leon", "jeff"]
+seinfeld_characters = ["jerry", "kramer", "george", "elaine"]
 characters = {
     "jerry": {
         "name": "Jerry",
@@ -240,48 +293,18 @@ characters = {
         "name": "Kramer",
         "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramer.webm",
         "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramer.mp4",
-        "laugh_video_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.webm",
-        "laugh_video_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/kramerlaugh.mp4",
         "selected": False,
     },
     "george": {
         "name": "George",
         "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/george.webm",
         "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/george.mp4",
-        "laugh_video_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/georgelaugh.mp4",
-        "laugh_video_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/georgelaugh.webm",
-        "selected": False,
-    },
-    "larry_david": {
-        "name": "Larry David",
-        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larry.webm",
-        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larry.mp4",
-        "laugh_video_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.mp4",
-        "laugh_video_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/larrylaugh.webm",
         "selected": False,
     },
     "elaine": {
         "name": "Elaine",
         "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/elaine.webm",
         "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/elaine.mp4",
-        "selected": False,
-    },
-    "newman": {
-        "name": "Newman",
-        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/newman.webm",
-        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/newman.mp4",
-        "selected": False,
-    },
-    "leon": {
-        "name": "Leon",
-        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/leon.webm",
-        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/leon.mp4",
-        "selected": False,
-    },
-    "jeff": {
-        "name": "Jeff",
-        "videopath_webm": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/jeff.webm",
-        "videopath_mp4": "https://raw.githubusercontent.com/younesbram/aicomedy/master/loadables/jeff.mp4",
         "selected": False,
     },
 }
@@ -318,26 +341,9 @@ for row in range(num_rows):
 
 selected_characters = [char_info["name"]
                        for char_info in characters.values() if char_info["selected"]]
+
 if st.button("Generate script"):
-    num_seinfeld_chars = sum(char_key in seinfeld_characters for char_key,
-                             char_info in characters.items() if char_info["selected"])
-    num_curb_chars = sum(char_key in curb_characters for char_key,
-                         char_info in characters.items() if char_info["selected"])
-
     if (topic or uploaded_image) and len(selected_characters) > 1:
-
-        # Determine which show's intro and outro to play based on the counts of selected characters
-        if num_seinfeld_chars > num_curb_chars:
-            intro_audio = open('sounds/introseinfeld.mp3', 'rb').read()
-            outro_audio = open('sounds/outroseinfeld.mp3', 'rb').read()
-        else:
-            intro_audio = open('sounds/introcurb.mp3', 'rb').read()
-            outro_audio = open('sounds/outrocurb.mp3', 'rb').read()
-
-        # Store intro and outro audio in session state
-        st.session_state['intro_audio'] = intro_audio
-        st.session_state['outro_audio'] = outro_audio
-
         # Play the intro audio while the user waits
         st.audio(intro_audio, format="audio/mp3")
 
@@ -360,6 +366,7 @@ if st.session_state.get('script'):
             audio_file_path = generate_audio_script(st.session_state['script'])
             if audio_file_path:
                 st.audio(audio_file_path, format="audio/mp3")
+                st.download_button(label="Download Audio", data=open(audio_file_path, "rb").read(), file_name="generated_audio.mp3", mime="audio/mpeg")
             else:
                 st.error("Failed to generate audio.")
         
@@ -385,6 +392,24 @@ if st.session_state.get('script'):
 
                 col_index += 1
 
+        if st.button("Generate Video"):
+            with st.spinner("Generating video..."):
+                user_image_path = None
+                if uploaded_image:
+                    user_image_path = uploaded_image.name
+                    with open(user_image_path, 'wb') as f:
+                        f.write(uploaded_image.getvalue())
+
+                video_path = create_video_with_images_and_audio(st.session_state['script'], audio_file_path, user_image=user_image_path)
+                if video_path:
+                    st.video(video_path)
+                    st.download_button(label="Download Video", data=open(video_path, "rb").read(), file_name="generated_video.mp4", mime="video/mp4")
+                    st.markdown(
+                        f'<a href="https://twitter.com/intent/tweet?text=Check out this AI-generated skit!&url=https://younes.ca" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Twitter-logo.svg" alt="Share on Twitter" height="20" width="20" style="margin-right:10px;">Share on Twitter</a>',
+                        unsafe_allow_html=True)
+                else:
+                    st.error("Failed to generate video.")
+            
 st.markdown(
     "Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
 if st.session_state.get('outro_audio'):
