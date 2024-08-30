@@ -7,8 +7,10 @@ import requests
 from io import BytesIO
 import base64
 from groq import Groq
+
 # Load environment variables from .env file
 load_dotenv()
+
 # Retrieve API keys from environment variables and secrets
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 elevenlabs_api_key = st.secrets["EV_API_KEY"]
@@ -21,8 +23,10 @@ elaine_voice = st.secrets["ELAINE_VOICE"]
 newman_voice = st.secrets["NEWMAN_VOICE"]
 leon_voice = st.secrets["LEON_VOICE"]
 jeff_voice = st.secrets["JEFF_VOICE"]
+
 if not groq_api_key:
     raise ValueError("GROQ_API_KEY environment variable not set")
+
 st.set_page_config(
     page_title="AI Skit Generator",
     page_icon="😂",
@@ -33,7 +37,9 @@ st.set_page_config(
         "About": "# AI Skit Generator\nAn app that uses AI to generate hilarious skits!",
     },
 )
+
 client = Groq(api_key=groq_api_key)
+
 # Initialize session state variables
 if 'script' not in st.session_state:
     st.session_state['script'] = None
@@ -41,20 +47,134 @@ if 'intro_audio' not in st.session_state:
     st.session_state['intro_audio'] = None
 if 'outro_audio' not in st.session_state:
     st.session_state['outro_audio'] = None
+
 def generate_joke_with_groq(topic, characters):
     messages = [
         {"role": "system",
             "content": f"You never give emotions in the script or pauses or descriptors or laughs. NO (pauses) NO (smirks) NO (laughs) NO ANY OF THAT ONLY THE TEXT!!!! You are an extremely funny and sarcastic comedian writer that knows Larry David and Jerry Seinfeld's writing styles, tasked with preserving {', '.join(characters)} jokes and delivering the same style punchlines in your short skits. You will respond in a script that includes {', '.join(characters)}."},
         {"role": "user",
-            "content": f"The topic is: {topic}. Please obey newlines and DONT give ANY descriptors only Character: speech for the ENTIRE script only with the characters selected. Nothing else or else the system bugs. Only respond as previous instructions and be extremely funny, like genius comedy. Do not add any extra characters. Do not add any descriptors like (pauses) or (excitedly) NO MATTER WHAT!  because I will be programmatically generating voice clips from the script. So anything like (sarcastically) or ANYTHING like that will destroy our whole moat and program. Take this seriously. INCLUDE EVERY CHARACTER SELECTED . {', '.join(characters)}"}    ]
+            "content": f"The topic is: {topic}. Please obey newlines and DONT give ANY descriptors only Character: speech for the ENTIRE script only with the characters. Nothing else or else the system bugs. Only respond as previous instructions and be extremely funny, like genius comedy. Do not add any extra characters. Do not add any descriptors like (pauses) or (excitedly) NO MATTER WHAT!  because I will be programmatically generating voice clips from the script. So anything like (sarcastically) or ANYTHING like that will destroy our whole moat and program. Take this seriously. INCLUDE EVERY CHARACTER SELECTED . {', '.join(characters)}"},
+    ]
 
     stream = client.chat.completions.create(
-@@ -175,8 +175,8 @@ def generate_voice(character_name, text):
+        messages=messages,
+        model="llama3-8b-8192",
+        temperature=0.420,
+        max_tokens=1024,
+        top_p=1,
+        stop=None,
+        stream=True,
+    )
+
+    generated_text = ""
+    for chunk in stream:
+        if chunk.choices[0].delta.content:
+            generated_text += chunk.choices[0].delta.content
+            st.session_state['script'] = generated_text
+    return generated_text
+
+def generate_joke(topic, characters, use_gpt4=False, image_data=None):
+    if use_gpt4 and image_data:
+        st.info("Generating script with GPT-4 Vision. This might take a few moments...  API costs aren't free, you know! Consider following my [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram) as a form of compensation. 😂  ")
+        img_str = base64.b64encode(image_data).decode('utf-8')
+        messages = [
+            {"role": "system",
+                "content": f"You are an extremely funny and sarcastic comedian writer that knows Larry David and Jerry Seinfeld's writing styles, tasked with preserving {', '.join(characters)} jokes and delivering the same style punchlines in your short skits. You will respond in a script that includes {', '.join(characters)}."},
+            {"role": "user",
+                "content": f"The topic is: {topic}. Only respond as previous instructions and be extremely funny, like genius comedy. Reply only with character names that I gave you followed by their script (make the responses deeply affected by the character's portrayed personality on their respective shows). Do not add any extra characters or descriptors or anything like sarcastically or laughs or whatever, ONLY the text to be voiced.."},
+            {"role": "user",
+                "content": [
+                    {"type": "text", "text": "Please use the following image as context."},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_str}"}}
+                ]}
+        ]
+
+        data = {
+            "model": "gpt-4o",
+            "messages": messages,
+            "temperature": 0.66666666666666666666666420,
+        }
+
+        api_url = "https://api.openai.com/v1/chat/completions"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {openai_api_key}"
+        }
+        response = requests.post(api_url, headers=headers, json=data)
+        
+        try:
+            response_data = response.json()
+            generated_text = response_data['choices'][0]['message']['content']
+            st.session_state['script'] = generated_text
+            st.write("Generated script with image context:")
+            st.write(generated_text)
+            return generated_text
+        except KeyError as e:
+            st.error(f"Failed to generate script: {response_data}")
+            return ""
+    else:
+        return generate_joke_with_groq(topic, characters)
+
+def create_video_html(video_path_webm, video_path_mp4, width=None, height=None):
+    width_attribute = f'width="{width}"' if width else ""
+    height_attribute = f'height="{height}"' if height else ""
+    return f"""
+    <style>
+        .video-container {{
+            margin: 16px;
+            display: inline-block;
+        }}
+        .video-container video {{
+            {width_attribute};
+            {height_attribute};
+        }}
+        @media only screen and (max-width: 480px) {{
+            .video-container video {{
+                width: 50%;
+                height: auto;
+            }}
+        }}
+    </style>
+    <div class="video-container">
+        <video {width_attribute} {height_attribute} autoplay loop muted playsinline>
+            <source src="{video_path_webm}" type="video/webm">
+            <source src="{video_path_mp4}" type="video/mp4">
+        </video>
+    </div>
+    """
+
+def load_image(url=None, path=None):
+    if url:
+        response = requests.get(url)
+        img = Image.open(BytesIO(response.content))
+    elif path:
+        img = Image.open(path)
+    return img
+
+def generate_voice(character_name, text):
+    voice_id = {
+        "jerry": jerry_voice,
+        "kramer": kramer_voice,
+        "george": george_voice,
+        "elaine": elaine_voice,
+        "newman": newman_voice,
+        "larry_david": larry_david_voice,
+        "leon": leon_voice,
+        "jeff": jeff_voice
+    }.get(character_name.lower())
+    
+    if not voice_id:
+        return None
+    
+    headers = {
+        "Accept": "audio/mpeg",
+        "Content-Type": "application/json",
+        "xi-api-key": elevenlabs_api_key
+    }
+    data = {
         "text": text,
         "model_id": "eleven_multilingual_v2",
         "voice_settings": {
-            "stability": 0.4,
-            "similarity_boost": 0.7
             "stability": 0.5,
             "similarity_boost": 0.6
         }
@@ -67,6 +187,7 @@ def generate_joke_with_groq(topic, characters):
     else:
         st.error(f"Failed to generate audio for {character_name}: {response.text}")
         return None
+
 def stitch_audio_segments(audio_segments):
     combined_audio = b""
     for segment in audio_segments:
@@ -74,11 +195,14 @@ def stitch_audio_segments(audio_segments):
     with open("combined_audio.mp3", "wb") as f:
         f.write(combined_audio)
     return "combined_audio.mp3"
+
 def generate_audio_script(script):
     lines = script.split("\n")
     audio_segments = []
+
     st.info("API costs aren't free, you know! Consider following my [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram) as a form of compensation. 😂")
     progress_bar = st.progress(0)
+
     for i, line in enumerate(lines):
         st.write(f"Processing line: {line}")
         if ":" in line:
@@ -90,14 +214,18 @@ def generate_audio_script(script):
             else:
                 st.write(f"Failed to generate audio segment for {character.strip()}")
         progress_bar.progress((i + 1) / len(lines))
+
     if audio_segments:
         audio_file_path = stitch_audio_segments(audio_segments)
         return audio_file_path
     return None
+
 st.title("AI Skit Generator")
+
 # Topic input and optional image upload
 topic = st.text_input("Enter a topic:")
 uploaded_image = st.file_uploader("Upload an image (optional - you can do only image or image + topic)", type=["jpg", "jpeg", "png"])
+
 # Character selection
 seinfeld_characters = ["jerry", "kramer", "george", "elaine", "newman"]
 curb_characters = ["larry_david", "leon", "jeff"]
@@ -157,28 +285,37 @@ characters = {
         "selected": False,
     },
 }
+
 # Create a container for the character selection
 character_selection_container = st.container()
+
 # Define the number of characters per row
 characters_per_row = 4
+
 # Calculate the number of rows required
 num_rows = (len(characters) + characters_per_row - 1) // characters_per_row
+
 # Iterate through the rows and columns to display the characters
 for row in range(num_rows):
     row_container = character_selection_container.container()
     cols = row_container.columns(characters_per_row)
+
     for col in range(characters_per_row):
         idx = row * characters_per_row + col
+
         # If there are no more characters to display, break the loop
         if idx >= len(characters):
             break
+
         char_key, char_info = list(characters.items())[idx]
+
         video_height = 120  # Set the desired height in pixels
         with cols[col]:
             video_html = create_video_html(
                 char_info["videopath_webm"], char_info["videopath_mp4"], height=video_height)
             st.markdown(video_html, unsafe_allow_html=True)
             char_info["selected"] = st.checkbox(char_info["name"])
+
 selected_characters = [char_info["name"]
                        for char_info in characters.values() if char_info["selected"]]
 if st.button("Generate script"):
@@ -186,7 +323,9 @@ if st.button("Generate script"):
                              char_info in characters.items() if char_info["selected"])
     num_curb_chars = sum(char_key in curb_characters for char_key,
                          char_info in characters.items() if char_info["selected"])
+
     if (topic or uploaded_image) and len(selected_characters) > 1:
+
         # Determine which show's intro and outro to play based on the counts of selected characters
         if num_seinfeld_chars > num_curb_chars:
             intro_audio = open('sounds/introseinfeld.mp3', 'rb').read()
@@ -194,11 +333,14 @@ if st.button("Generate script"):
         else:
             intro_audio = open('sounds/introcurb.mp3', 'rb').read()
             outro_audio = open('sounds/outrocurb.mp3', 'rb').read()
+
         # Store intro and outro audio in session state
         st.session_state['intro_audio'] = intro_audio
         st.session_state['outro_audio'] = outro_audio
+
         # Play the intro audio while the user waits
         st.audio(intro_audio, format="audio/mp3")
+
         # Add a spinner with a message while generating the script
         with st.spinner("Generating script... This might take a few moments... might as well follow my twitter and github.."):
             image_data = None
@@ -210,6 +352,7 @@ if st.button("Generate script"):
         
         st.session_state['script'] = generated_script
         st.write(generated_script)
+
 # Add button to generate audio if script is generated
 if st.session_state.get('script'):
     if st.button("Generate Audio"):
@@ -221,6 +364,7 @@ if st.session_state.get('script'):
                 st.error("Failed to generate audio.")
         
         st.info("Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
+
         # Display the laugh videos after generating the audio
         laugh_videos_container = st.container()
         laugh_video_height = 166.67
@@ -233,11 +377,14 @@ if st.session_state.get('script'):
             if "laugh_video_webm" in char_info and "laugh_video_mp4" in char_info:
                 laugh_video_webm = char_info["laugh_video_webm"]
                 laugh_video_mp4 = char_info["laugh_video_mp4"]
+
                 with laugh_videos_cols[col_index]:
                     laugh_video_html = create_video_html(
                         laugh_video_webm, laugh_video_mp4, width=220, height=laugh_video_height)
                     st.markdown(laugh_video_html, unsafe_allow_html=True)
+
                 col_index += 1
+
 st.markdown(
     "Follow me on my Twitter: [@didntdrinkwater](https://twitter.com/didntdrinkwater) and GitHub: [@younesbram](https://www.github.com/younesbram)")
 if st.session_state.get('outro_audio'):
