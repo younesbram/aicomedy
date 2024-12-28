@@ -15,10 +15,7 @@ Expandable comedian roster
 # Technologies
 <a href="https://elevenlabs.io/text-to-speech">
 <img src="https://storage.googleapis.com/eleven-public-cdn/images/elevenlabs-grants-logo.png" alt="Text to Speech" style="width:250px">
-</a>
-* Python
-* Streamlit
-* OpenAI GPT-3.5
+
 # Installation
 Clone the repository:
 ```
